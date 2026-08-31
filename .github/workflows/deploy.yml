@@ -1,0 +1,35 @@
+name: Deploy Go Wasm to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Check out code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Install Go on the runner
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.2"
+
+      # 3. Compile wasm
+      - name: Build WebAssembly
+        run: |
+          GOOS=js GOARCH=wasm go build -o main.wasm
+
+      # 4. Deploy to "gh-pages" branch
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: .
+          branch: gh-pages
