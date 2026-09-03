@@ -1,6 +1,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <title>Pong123t</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <script src="wasm_exec.js"></script>
     <script>
       const go = new Go();
@@ -343,14 +345,17 @@
         </div></span
       >
     </div> -->
-    <canvas
-      id="gameCanvas"
-      width="480"
-      height="360"
-      style="
-        border: 0.0625rem solid hsla(0, 0%, 0%, 0.15);
-        border-radius: 0.5rem;
-      "
-    ></canvas>
+    <div style="display: grid; place-content: center; height: 75vh">
+      <h1 style="color: rgb(87, 94, 117); font-family: sans-serif">Pong123t</h1>
+      <canvas
+        id="gameCanvas"
+        width="480"
+        height="360"
+        style="
+          border: 0.0625rem solid hsla(0, 0%, 0%, 0.15);
+          border-radius: 0.5rem;
+        "
+      ></canvas>
+    </div>
   </body>
 </html>
