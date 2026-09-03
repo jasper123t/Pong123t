@@ -33,3 +33,4 @@ jobs:
         with:
           folder: .
           branch: gh-pages
+          clean: false
