@@ -29,6 +29,7 @@ jobs:
           GOOS=js GOARCH=wasm go build -o dist/main.wasm
           cp index.html dist/
           cp wasm_exec.js dist/
+          cp favicon.svg dist/
 
       # 4. Deploy to "gh-pages" branch
       - name: Deploy to GitHub Pages
