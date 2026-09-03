@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"math/rand/v2"
 	"syscall/js"
@@ -14,7 +15,7 @@ const (
 	CanvasHeight = 360
 
 	BallColor  = "#ff0000"
-	BallRadius = "15"
+	BallRadius = 15
 
 	BarColor  = "#009933"
 	BarWidth  = 186
@@ -32,12 +33,16 @@ type Ball struct {
 }
 
 func (b *Ball) Draw(ctx js.Value) {
-	b.y += math.Sin(b.dir*(math.Pi/180.0)) * 10
-	b.x += math.Cos(b.dir*(math.Pi/180.0)) * 10
+	b.x += math.Sin(b.dir*(math.Pi/180.0)) * 10
+	b.y += math.Cos(b.dir*(math.Pi/180.0)) * 10
 	ctx.Set("fillStyle", BallColor)
 	ctx.Call("beginPath")
 	ctx.Call("arc", b.x, b.y, BallRadius, 0, 2*math.Pi)
 	ctx.Call("fill")
+}
+
+func (b *Ball) bounce(delta float64) {
+	b.dir = delta - b.dir
 }
 
 type Bar struct {
@@ -75,7 +80,7 @@ func main() {
 	gameBall := Ball{
 		x:   float64(CanvasWidth/2 + randInt(-10, 10)),
 		y:   float64(CanvasHeight/2 + randInt(-10, 10)),
-		dir: float64(randInt(70, 110)),
+		dir: float64(randInt(160, 200)),
 	}
 
 	gameBar := Bar{
@@ -104,16 +109,47 @@ func main() {
 	js.Global().Call("addEventListener", "keyup", onKeyUp)
 
 	for range time.Tick(FPS) {
+
+		resx := gameBall.x + math.Sin(gameBall.dir*(math.Pi/180.0))*10 + BallRadius
+		resy := gameBall.y + math.Cos(gameBall.dir*(math.Pi/180.0))*10
+		resd := ctx.Call("getImageData", resx, resy, 1, 1).Get("data")
+		// 	resd.Index(0).Int(), // R
+		// 	resd.Index(1).Int(), // G
+		// 	resd.Index(2).Int(), // B
+
 		if keysPressed["KeyA"] || keysPressed["ArrowLeft"] {
 			gameBar.x -= 5
 		}
 		if keysPressed["KeyD"] || keysPressed["ArrowRight"] {
 			gameBar.x += 5
 		}
+
+		if gameBall.x < BallRadius {
+			gameBall.bounce(0)
+			gameBall.x = BallRadius
+		}
+		if gameBall.x > CanvasWidth-BallRadius {
+			gameBall.bounce(0)
+			gameBall.x = CanvasWidth - BallRadius
+		}
+		if gameBall.y < BallRadius {
+			gameBall.bounce(180)
+			gameBall.y = BallRadius
+		}
+		if resd.Index(1).Int() == 153 {
+			gameBall.bounce(gameBall.dir + float64(180+randInt(-20, 20)+randInt(-20, 20)))
+		}
+		if gameBall.y > CanvasHeight-31 {
+			fmt.Printf("dead\n")
+		}
+		if gameBall.y > CanvasHeight-BallRadius {
+			gameBall.bounce(180)
+			gameBall.y = CanvasHeight - BallRadius
+		}
 		ctx.Call("clearRect", 0, 0, CanvasWidth, CanvasHeight)
-		gameBall.Draw(ctx)
 		gameBar.Draw(ctx)
 		gameFloor.Draw(ctx)
+		gameBall.Draw(ctx)
 	}
 
 	select {}

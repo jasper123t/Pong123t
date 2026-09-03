@@ -37,3 +37,4 @@ jobs:
         with:
           folder: dist
           branch: gh-pages
+          commit-message: "Build triggered by: ${{ github.event.head_commit.message }}"
